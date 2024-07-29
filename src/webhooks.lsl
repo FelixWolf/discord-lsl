@@ -30,6 +30,15 @@ string objectKey(string src, list dir, string def){
     return src;
 }
 
+string getTextureURL(key id, integer size){
+    // This redirects to:
+    // https://picture-service.secondlife.com/<id>/<size>.jpg
+    // Known sizes are [<256,192,0>, <256,192,0>, <320,240,0>, <60,45,0>]
+    // Was previously available at http://texture-service.agni.lindenlab.com/<id>/<size>.jpg
+    // If all else fails, use https://agni.secondlife.softhyena.com/?texture_id=<id>&size=256x256&format=jpg
+    return "https://secondlife.com/app/image/"+(string)id+"/"+(string)size;
+}
+
 /**************** DOCUMENTATION ****************
 //Webhooks
 string WebhookCreate(string id, string token)
@@ -197,7 +206,7 @@ string WebhookSetFields(string data, list props){
 }
 string WebhookSetText(string data, string text){return WebhookSetFields(data, ["content", text]);}
 string WebhookSetUsername(string data, string text){return WebhookSetFields(data, ["username", text]);}
-string WebhookSetAvatar(string data, key avatar){return WebhookSetFields(data, ["avatar_url", "http://texture-service.agni.lindenlab.com/"+(string)avatar+"/256x192/"]);}
+string WebhookSetAvatar(string data, key avatar){return WebhookSetFields(data, ["avatar_url", getTextureURL(avatar, 2)]);}
 string WebhookSetEmbeds(string data, list embeds){return WebhookSetFields(data, ["embeds", array(embeds)]);}
 
 //Embeds
@@ -226,14 +235,14 @@ string EmbedSetUrl(string data, string text){return EmbedSetFields(data, ["url",
 string EmbedSetColor(string data, vector col){return EmbedSetFields(data, ["color", ((llRound(col.x*255)&0xFF)<<16) | ((llRound(col.y*255)&0xFF) << 8) | ((llRound(col.z*255)&0xFF))]);}
 string EmbedSetFooter(string data, string text, key icon){
     list tmp = ["text", text];
-    if(icon!="")tmp+=["icon", "http://texture-service.agni.lindenlab.com/"+(string)icon+"/256x192/"];
+    if(icon!="")tmp+=["icon", getTextureURL(icon, 3)];
     return EmbedSetFields(data, ["footer", object(tmp)]);
 }
 string EmbedSetImage(string data, key image){
-    return EmbedSetFields(data, ["image", object(["url", "http://texture-service.agni.lindenlab.com/"+(string)image+"/256x192/", "width", 256, "height", 192])]);
+    return EmbedSetFields(data, ["image", object(["url", getTextureURL(image, 2), "width", 320, "height", 240])]);
 }
 string EmbedSetThumbnail(string data, key thumbnail){
-    return EmbedSetFields(data, ["thumbnail", object(["url", "http://texture-service.agni.lindenlab.com/"+(string)thumbnail+"/256x192/", "width", 256, "height", 192])]);
+    return EmbedSetFields(data, ["thumbnail", object(["url", getTextureURL(thumbnail, 2), "width", 320, "height", 240])]);
 }
 string EmbedSetVideo(string data, string url, integer width, integer height){
     return EmbedSetFields(data, ["video", object(["url", url, "width", width, "height", height]);
@@ -246,7 +255,7 @@ string EmbedSetProvider(string data, string name, string url){
 string EmbedSetAuthor(string data, string name, string url, key icon){
     list tmp = ["name", name];
     if(url!="")tmp+=["url", url];
-    if(icon!="")tmp+=["icon_url", "http://texture-service.agni.lindenlab.com/"+(string)icon+"/256x192/"];
+    if(icon!="")tmp+=["icon_url", getTextureURL(icon, 3)];
     return EmbedSetFields(data, ["author", object(tmp)]);
 }
 string EmbedAddField(string data, string name, string value, integer inline){
